@@ -7,4 +7,5 @@ numpy
 beautifulsoup4
 python-multipart
 pydantic
+pydantic-settings
 selenium
