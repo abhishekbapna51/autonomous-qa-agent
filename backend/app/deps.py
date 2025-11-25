@@ -1,6 +1,5 @@
 from pathlib import Path
 from sentence_transformers import SentenceTransformer
-import requests
 
 from .config import settings
 from .services.vector_store_service import VectorStoreService
@@ -13,50 +12,89 @@ from .utils.logging_utils import get_logger
 logger = get_logger(__name__)
 
 
-class OllamaLLMClient:
+class StubLLMClient:
     """
-    LLM client that talks to a local Ollama server.
-
-    Make sure Ollama is running and that you've pulled a model:
-      ollama pull llama3.2:1b
+    Simple stub LLM client so the app can run without a real LLM.
+    Used for the hosted version (Render + Streamlit Cloud) where Ollama
+    is not available.
     """
-
-    def __init__(self, base_url: str = "http://localhost:11434", model: str = "llama3.2:1b"):
-        self.base_url = base_url
-        self.model = model
 
     def generate(self, prompt: str) -> str:
-        logger.info(f"Calling Ollama model '{self.model}'...")
-        try:
-            # timeout can be (connect_timeout, read_timeout)
-            resp = requests.post(
-                f"{self.base_url}/api/generate",
-                json={
-                    "model": self.model,
-                    "prompt": prompt,
-                    "stream": False,
-                },
-                timeout=(10, 300),  # 10s connect, 300s (5 min) read timeout
-            )
-            resp.raise_for_status()
-            data = resp.json()
-            return data.get("response", "")
-        except requests.exceptions.ReadTimeout:
-            logger.error("Ollama request timed out.")
-            # Return something parsable so app doesn't crash
-            return "[]"
-        except Exception as e:
-            logger.error(f"Ollama request failed: {e}")
-            return "[]"
+        # If we are asking for test cases, return a fixed JSON array
+        if "Return ONLY a JSON array of test cases" in prompt or "Return ONLY a JSON array" in prompt:
+            return """
+[
+  {
+    "test_id": "TC-001",
+    "feature": "Discount Code",
+    "scenario": "Apply valid discount code 'SAVE15'",
+    "preconditions": ["User has items in cart"],
+    "steps": [
+      "Open checkout page",
+      "Enter discount code 'SAVE15'",
+      "Click 'Apply' button"
+    ],
+    "expected_result": "Total price is reduced by 15%",
+    "grounded_in": ["product_specs.md"]
+  },
+  {
+    "test_id": "TC-002",
+    "feature": "Discount Code",
+    "scenario": "Apply invalid discount code",
+    "preconditions": ["User has items in cart"],
+    "steps": [
+      "Open checkout page",
+      "Enter discount code 'INVALID'",
+      "Click 'Apply' button"
+    ],
+    "expected_result": "Invalid discount code. Total price is unchanged",
+    "grounded_in": ["product_specs.md", "ui_ux_guide.txt"]
+  }
+]
+"""
+        # If we are asking for Selenium script, return a simple example
+        if "You are an expert in Selenium (Python)." in prompt:
+            return """from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+def test_discount_code():
+    driver = webdriver.Chrome()
+    driver.maximize_window()
+    wait = WebDriverWait(driver, 10)
+
+    try:
+        driver.get("http://example.com/checkout")
+
+        code_input = wait.until(EC.visibility_of_element_located((By.ID, "discount-code")))
+        code_input.clear()
+        code_input.send_keys("SAVE15")
+
+        apply_btn = wait.until(EC.element_to_be_clickable((By.ID, "apply-discount")))
+        apply_btn.click()
+
+        success_msg = wait.until(EC.visibility_of_element_located((By.ID, "discount-success")))
+        assert "15%" in success_msg.text or "Payment Successful" in success_msg.text
+
+    finally:
+        driver.quit()
+
+if __name__ == "__main__":
+    test_discount_code()
+"""
+
+        # Fallback
+        return "[]"
 
 
-# Singletons
+# ---------- Singletons ----------
 
 logger.info("Loading SentenceTransformer embedder...")
 embedder = SentenceTransformer(settings.EMBEDDING_MODEL_NAME)
 
 vector_store = VectorStoreService()
-llm_client = OllamaLLMClient()
+llm_client = StubLLMClient()
 
 ingestion_service = IngestionService(vector_store, embedder)
 rag_service = RAGService(vector_store, embedder, llm_client)
