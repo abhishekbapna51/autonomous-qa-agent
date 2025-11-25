@@ -1,0 +1,7 @@
+UI / UX Guidelines
+
+1. Form validation errors must be displayed in red text.
+2. The 'Pay Now' button should be green with white text.
+3. Inline error messages should appear next to the corresponding input field.
+4. On successful payment, display the message 'Payment Successful!' in green.
+5. When an invalid discount code is entered, show a clear error message and do not change the total price.

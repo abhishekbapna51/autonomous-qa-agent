@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+streamlit
+requests
+sentence-transformers
+numpy
+beautifulsoup4
+python-multipart
+pydantic
+selenium

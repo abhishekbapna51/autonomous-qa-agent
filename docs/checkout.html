@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>E-Shop Checkout</title>
+  <style>
+    .error { color: red; }
+    .success { color: green; }
+    #pay-now { background-color: green; color: white; }
+  </style>
+</head>
+<body>
+  <h1>E-Shop Checkout</h1>
+
+  <section id="products">
+    <h2>Products</h2>
+    <div class="product">
+      <span class="name">Item A</span>
+      <span class="price" data-price="50">₹50</span>
+      <button class="add-to-cart" data-product-id="item-a">Add to Cart</button>
+    </div>
+    <div class="product">
+      <span class="name">Item B</span>
+      <span class="price" data-price="80">₹80</span>
+      <button class="add-to-cart" data-product-id="item-b">Add to Cart</button>
+    </div>
+  </section>
+
+  <section id="cart">
+    <h2>Cart Summary</h2>
+    <div>
+      <label>Item A Qty:</label>
+      <input id="qty-item-a" type="number" min="0" value="1">
+    </div>
+    <div>
+      <label>Item B Qty:</label>
+      <input id="qty-item-b" type="number" min="0" value="0">
+    </div>
+    <div>
+      <label>Discount Code:</label>
+      <input id="discount-code" type="text">
+      <button id="apply-discount">Apply</button>
+      <span id="discount-success" class="success" style="display:none;">Discount applied!</span>
+      <span id="discount-error" class="error" style="display:none;">Invalid discount code.</span>
+    </div>
+    <p>Total: ₹<span id="total-price">50</span></p>
+  </section>
+
+  <section id="user-details">
+    <h2>User Details</h2>
+    <form id="checkout-form">
+      <div>
+        <label for="name">Name*</label>
+        <input id="name" name="name" type="text">
+        <span id="name-error" class="error"></span>
+      </div>
+      <div>
+        <label for="email">Email*</label>
+        <input id="email" name="email" type="email">
+        <span id="email-error" class="error"></span>
+      </div>
+      <div>
+        <label for="address">Address*</label>
+        <textarea id="address" name="address"></textarea>
+        <span id="address-error" class="error"></span>
+      </div>
+
+      <h3>Shipping Method</h3>
+      <label><input type="radio" name="shipping" value="standard" checked> Standard</label>
+      <label><input type="radio" name="shipping" value="express"> Express</label>
+
+      <h3>Payment Method</h3>
+      <label><input type="radio" name="payment" value="card" checked> Credit Card</label>
+      <label><input type="radio" name="payment" value="paypal"> PayPal</label>
+
+      <button id="pay-now" type="submit">Pay Now</button>
+      <p id="payment-message" class="success" style="display:none;">Payment Successful!</p>
+    </form>
+  </section>
+
+  <!-- In real app you'd add JS for validation and behaviour -->
+</body>
+</html>
