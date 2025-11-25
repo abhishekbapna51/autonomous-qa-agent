@@ -1,7 +1,8 @@
 import streamlit as st
 import requests
 
-API_BASE = "http://localhost:8000"
+API_BASE = "https://autonomous-qa-agent-to4k.onrender.com"
+
 
 st.set_page_config(page_title="Autonomous QA Agent", layout="wide")
 
